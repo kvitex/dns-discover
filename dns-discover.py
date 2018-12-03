@@ -70,13 +70,13 @@ def metrics_output():
         nameserver = str(ns[0])[:-1]
         zoneorigin = str(z.origin)[:-1]
         if ns[0] and ns[1]:
-            metrics.append('zone_xfer_success {{job="dns_a_discover", name_server={}, zone_origin="{}"}} 1'
+            metrics.append('zone_xfer_success {{job="dns_a_discover", name_server="{}", zone_origin="{}"}} 1'
                            .format(nameserver, zoneorigin ))
-            metrics.append('zone_serial {{job="dns_a_discover", name_server={}, zone_origin="{}"}} {}'
+            metrics.append('zone_serial {{job="dns_a_discover", name_server="{}", zone_origin="{}"}} {}'
                            .format(nameserver, zoneorigin, ns[1]))
-            metrics.append('zone_xfer_time {{job="dns_a_discover", name_server={}, zone_origin="{}"}} {}'
+            metrics.append('zone_xfer_time {{job="dns_a_discover", name_server="{}", zone_origin="{}"}} {}'
                            .format(nameserver, zoneorigin, ns[2]))
         else:
-            metrics.append('zone_xfer_success {{job="dns_a_discover", name_server={}, zone_origin="{}"}} 0'
+            metrics.append('zone_xfer_success {{job="dns_a_discover", name_server="{}", zone_origin="{}"}} 0'
                            .format(nameserver, str(z.origin)[:-1]))
     return('\n'.join(metrics))
