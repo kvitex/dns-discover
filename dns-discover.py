@@ -42,6 +42,7 @@ def metrics_output():
         try:
             startTime = time.time()
             z = dns.zone.from_xfr(dns.query.xfr(str(ns), domain_name))
+            zoneorigin = str(z.origin)[:-1]
         except:
             name_servers.append((str(ns), None, None))
         else:
@@ -59,7 +60,7 @@ def metrics_output():
         with open(''.join(['./', file_prefix,'_', str(z.origin), 'json']), 'w') as output_file:
             for target in targets:
                 hosts.append(
-                    {'labels': {'hostname': target[0], 'job': prometheus_job},
+                    {'labels': {'hostname': '.'.join([target[0], zoneorigin]), 'job': prometheus_job},
                      'targets': [target[1], ]})
             # print(json.dumps(hosts, sort_keys=True, indent=4))
             print(json.dumps(hosts, sort_keys=True, indent=4), file=output_file)
@@ -68,7 +69,6 @@ def metrics_output():
     metrics = []
     for ns in name_servers:
         nameserver = str(ns[0])[:-1]
-        zoneorigin = str(z.origin)[:-1]
         if ns[0] and ns[1]:
             metrics.append('zone_xfer_success {{job="dns_a_discover", name_server="{}", zone_origin="{}"}} 1'
                            .format(nameserver, zoneorigin ))
