@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from flask import Flask
 from flask import request
-import requests
-import dns.query
+import dns.query  # dnspython module
 import dns.zone
 import dns.resolver
 import time
