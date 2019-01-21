@@ -1,12 +1,12 @@
 Make discover of hosts by DNS for prometheus black-box-exporter.
 Script acts like Prometheus exporter and using Flask framework.
-It discovers nameservers from required domains, makes XFER request from discovered nameservers.
+It discovers nameservers for required domains and makes XFER requests to discovered nameservers.
 All A records are to be placed into dns_blackbox_icmp_<your_domain>.json files.
-Script returns to Prometheus some metrics and checks if domain serial is equal for all nameservers.
-Host running script  should be allowed to make XFER from NS servers for requied domains.
+Script returns to Prometheus some metrics  and checks if domain serial is equal for all nameservers.
+Host running this script  should be allowed to make XFER from NS servers for requied domains.
 To start script use "start_ap.sh"
 
-Here is a sample configuration for Prometheus:
+Here is a simple configuration for Prometheus:
 
 - job_name: 'dns-discover'
     scrape_interval: 5m
