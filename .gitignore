@@ -1,5 +1,6 @@
 *
 !README
+!Dockerfile
 !.gitignore
 !requirements.txt
 !*.py
