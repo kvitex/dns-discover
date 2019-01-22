@@ -1,6 +1,7 @@
 *
 !README
 !.gitignore
+!requirements.txt
 !*.py
 !*.exmp
 !start_app.sh
