@@ -63,12 +63,9 @@ def metrics_output():
                '\n'.join(list(map(lambda ns: ns[0], name_servers)))))
     names = z.keys()
     for n in names:
-        print('Before:', n)
         get_A_addresses(z[n].rdatasets, str(n), records)
     txt_off_names = set([ record[0] for record in records if record[1] == txt_off ])
-    print(txt_off_names)
-    targets = [record for record in records if record[0] not in txt_off_names]
-    print(targets)
+    targets = [record for record in records if (record[0] not in txt_off_names) and record[2] == 'A']
     hosts = []
     try:
         with open(''.join(['./', file_prefix,'_', str(z.origin), 'json']), 'w') as output_file:
