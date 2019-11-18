@@ -5,6 +5,7 @@ All A records are to be placed into dns_blackbox_icmp_<your_domain>.json files.
 Script returns to Prometheus some metrics  and checks if domain serial is equal for all nameservers.
 Host running this script  should be allowed to make XFER from NS servers for requied domains.
 To start script use "start_app.sh 0.0.0.0 9053" or you can bind any other  ip and port. 
+Place record TXT  "no-dns-check" for the node to ignore its A record. 
 
 Here is a simple configuration for Prometheus:
 

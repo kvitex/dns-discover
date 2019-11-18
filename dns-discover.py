@@ -8,23 +8,34 @@ import time
 import json
 
 
-def get_A_addresses(rdataset, nodename, address_list):
+prometheus_job = 'dns_blackbox_icmp'
+file_prefix    = 'dns_blackbox_icmp'
+txt_off        = 'no-dns-check'
+
+def get_A_addresses(rdataset, nodename, records):
     for rd in rdataset:
         if isinstance(rd, (dns.rdataset.Rdataset, list)):
-            get_A_addresses(rd, nodename, address_list)
+            print('RC {}'.format(rd))
+            print(type(rd), 'RC')
+            get_A_addresses(rd, nodename, records)
         elif isinstance(rd, dns.rdtypes.IN.A.A):
-            address_list.append((nodename, rd.address))
+            print('Appending', rd.address)
+            records.append((nodename, rd.address, 'A')) 
+        elif isinstance(rd, dns.rdtypes.ANY.TXT.TXT):
+            print('TXT', rd.strings[0].decode('UTF-8'))
+            records.append((nodename, rd.strings[0].decode('UTF-8'), 'TXT'))     
         else:
             pass
     return
+#def get_TXT_records(rdataset, nodename, address_list):
+#    for rd in
 
 app = Flask(__name__)
 @app.route('/metrics', methods=['GET', 'POST'])
 def metrics_output():
-    targets = []
+    targets = {}
     name_servers = []
-    prometheus_job = 'dns_blackbox_icmp'
-    file_prefix = 'dns_blackbox_icmp'
+    records = []
     domain_name = None
     if request.method == 'POST':
         domain_name = request.form.get('domain_name')
@@ -48,12 +59,16 @@ def metrics_output():
             name_servers.append((str(ns), z['@'].rdatasets[0].items[0].serial, time.time() - startTime))
             xfer_success = True
     if not xfer_success:
-        return('Error while transfering zone {} from nameservers:\n'.format(domain_name),
-               '\n'.join(list(map(lambda ns: ns[0], name_servers))))
-
+        return('Error while transfering zone {} from nameservers:\n{}'.format(domain_name,
+               '\n'.join(list(map(lambda ns: ns[0], name_servers)))))
     names = z.keys()
     for n in names:
-        get_A_addresses(z[n].rdatasets, str(n), targets)
+        print('Before:', n)
+        get_A_addresses(z[n].rdatasets, str(n), records)
+    txt_off_names = set([ record[0] for record in records if record[1] == txt_off ])
+    print(txt_off_names)
+    targets = [record for record in records if record[0] not in txt_off_names]
+    print(targets)
     hosts = []
     try:
         with open(''.join(['./', file_prefix,'_', str(z.origin), 'json']), 'w') as output_file:
@@ -61,7 +76,6 @@ def metrics_output():
                 hosts.append(
                     {'labels': {'hostname': '.'.join([target[0], zoneorigin]), 'job': prometheus_job},
                      'targets': [target[1], ]})
-            # print(json.dumps(hosts, sort_keys=True, indent=4))
             print(json.dumps(hosts, sort_keys=True, indent=4), file=output_file)
     except:
         return('Error while writing json file {} '.format(''.join(['./', file_prefix,'_', str(z.origin), 'json'])))
